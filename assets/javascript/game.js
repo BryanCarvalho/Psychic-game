@@ -5,50 +5,74 @@ var losses = 0;
 var remainder = 10;
 var guessedLetters = [];
 
+// Initialize a random letter to begin 
+
+var alphabet = "abcdefghijklmnopqrstuvwxyz";
+var computerGuess = randomLetter();
+
 // function that selects a random letter from the alphabet string
 
 function randomLetter() {
-    var alphabet = "abcdefghijklmnopqrstuvwxyz";
     var randNum = Math.floor(Math.random() * alphabet.length);
     var emptyString = alphabet[randNum];
     return emptyString;
 }
 
-// on user's input trigger the whether the user has won or lost
+// function that resets remainder
 
-document.onkeyup = function (event) {
-    var userGuess = event.key;
-    var computerGuess = randomLetter();
-    if (computerGuess === userGuess) {
-        console.log(`success! both guessed ${computerGuess}`);
-        wins++;
-        guessedLetters.push(userGuess);
-    } else {
-        console.log(`fail! guessed ${computerGuess} : ${userGuess}`);
-        losses++;
-        remainder--;
-        guessedLetters.push(userGuess);
-    }
+function resetRemainder() {
+    remainder = 10;
+}
 
-    // print these events to the console. Just to test.
-
-    console.log(`wins: ${wins}`);
-    console.log(`losses: ${losses}`);
-    console.log(`remainder: ${remainder}`);
-    console.log(`----------------------`);
-
+function updateDisplay() {
     document.getElementById("card-text-wins").innerHTML = `${wins}`;
     document.getElementById("card-text-losses").innerHTML = `${losses}`;
     document.getElementById("card-text-guessesLeft").innerHTML = `${remainder}`;
     document.getElementById("guessedLetters").innerHTML = `${guessedLetters}`;
+}
 
-    // if less than one game, trigger the game over screen
+// Initialize the display
 
-    if (remainder < 1) {
-        alert('game over!')
+updateDisplay();
+
+// on user's input trigger the whether the user has won or lost
+
+document.onkeyup = function (event) {
+
+    // User's input
+
+    var userGuess = event.key;
+
+    // Correct guess, reset wins, remainders, clear guesses, and select a new letter
+
+    if (computerGuess === userGuess) {
+        wins++;
+        resetRemainder();
+        guessedLetters = [];
+        computerGuess = randomLetter();
+    } else if (computerGuess !== userGuess && remainder > 1) {
+        remainder--;
+        guessedLetters.push(userGuess);
+    } else {
+
+        // Increment loss, reset remainder, clear the guessed letters, and pick a new letter
+
+        losses++;
+        remainder = 10;
+        guessedLetters = [];
+        computerGuess = randomLetter();
+    }
+
+    if (losses == 10) {
+        alert("Game Over!");
+
+        // Reset game to initial values
+
         wins = 0;
         losses = 0;
         remainder = 10;
         guessedLetters = [];
     }
+
+    updateDisplay();
 }
